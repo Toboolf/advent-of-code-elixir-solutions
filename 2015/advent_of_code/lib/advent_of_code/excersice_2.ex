@@ -1,5 +1,11 @@
 defmodule ElvesWrappingRequest do
   
+  defp to_list_of_ints(gift_sizes) do
+    gift_sizes
+    |> String.split()
+    |> Enum.map( fn(single_gift) -> Enum.map(String.split(single_gift,"x"), fn(each_size) -> String.to_integer(each_size) end) end )
+  end
+
   defp wrapping_required(area1, area2, area3) do
     (2 * (area1 + area2 + area3)) + Enum.min [area1,area2,area3]
   end
@@ -17,5 +23,23 @@ defmodule ElvesWrappingRequest do
     |> Enum.map( fn(gift_specs) -> Enum.map(String.split(gift_specs,"x"), fn(each_size) -> String.to_integer(each_size) end) |> List.to_tuple() end)
     |> start_wrapping()
   end
+
+  defp min_perimeter(dimentions) do
+    [a, b | _] = Enum.sort(dimentions)
+    2*(a+b)
+  end
+
+  defp length_of_bow([l,w,h]), do: l * w * h
+
+  def request_ribbon(gift_sizes) do
+    gift_sizes
+    |> to_list_of_ints()
+    |> calculate_total_ribbon()
+  end
+
+  defp calculate_total_ribbon(gift_list), do: ribbon_gift(gift_list, 0)
+
+  defp ribbon_gift([], count), do: count
+  defp ribbon_gift([h | t], count), do: ribbon_gift(t, count + min_perimeter(h) + length_of_bow(h))
 
 end
